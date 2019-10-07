@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+        }
+
+        img {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+
+    </div>
+    <script>
+        const main = document.querySelector(".main")
+        const options = {
+            Headers: {
+                Authorization: "Client-ID 043e697d6ca34df",
+                Accept: "*/*",
+                "Cache-Control": "no-cache",
+                "Accept-Encoding": "gzip, deflate"
+            }
+        }
+
+        window.onload = function () {
+            fetch("https://api.imgur.com/3/album/yclkUN3/images", options)
+                .then(res => res.json())
+                .then(images => {
+                    return images
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error)
+                    }
+                    else {
+                        return data.data
+                    }
+
+                })
+                .then(images => {
+                    const numberImagesToDisplay = randomFromLength(1, images.length)
+
+                    const keys = []
+                    for (let i = 0; i < numberImagesToDisplay; i++) {
+                        let random = randomFromLength(0, images.length)
+                        keys.push(images[random])
+                        images.splice(random, 1)
+                    }
+                    const imgs = keys.filter(image => image).map(image => {
+                        const img = document.createElement("img")
+                        img.src = image.link
+                        const wrapper = document.createElement("div")
+                        wrapper.classList.add("image-wrap")
+                        wrapper.appendChild(img)
+                        return wrapper
+                    });
+                    console.log(imgs)
+                    imgs.forEach(function (img) {
+                        main.appendChild(img)
+                    })
+
+                })
+                .catch(err => console.log("Cool error: ", err))
+        };
+
+        function randomFromLength(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+    </script>
+</body>
+
+</html>
