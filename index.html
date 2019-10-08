@@ -42,7 +42,7 @@
                 })
                 .then(data => {
                     if (!data.success) {
-                        throw new Error(data)
+                        throw new Error(JSON.stringify(data))
                     }
                     else {
                         return data.data
