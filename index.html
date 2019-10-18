@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <title>Random Images</title>
     <style>
         .main {
             display: grid;
@@ -24,56 +25,48 @@
 
     </div>
     <script>
-        const main = document.querySelector(".main")
-        const options = {
-            Headers: {
-                'Authorization': "Client-ID 4cbad21b51c270d",
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                "Access-Control-Request-Method": "GET"
-            }
-        }
-
         window.onload = function () {
-            fetch("https://api.imgur.com/3/album/UlXYonI/images", options)
-                .then(res => res.json())
-                .then(images => {
-                    return images
-                })
-                .then(data => {
-                    if (!data.success) {
-                        throw new Error(JSON.stringify(data))
-                    }
-                    else {
-                        return data.data
-                    }
+            var form = new FormData();
+            var settings = {
+                "url": "https://api.imgur.com/3/album/UlXYonI/images",
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": "Client-ID 4cbad21b51c270d"
+                },
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": form
+            };
 
-                })
-                .then(images => {
-                    const numberImagesToDisplay = randomFromLength(1, images.length)
+            $.ajax(settings).done(function (response) {
+                const main = document.querySelector(".main");
 
-                    const keys = []
-                    for (let i = 0; i < numberImagesToDisplay; i++) {
-                        let random = randomFromLength(0, images.length)
-                        keys.push(images[random])
-                        images.splice(random, 1)
-                    }
-                    const imgs = keys.filter(image => image).map(image => {
-                        const img = document.createElement("img")
-                        img.src = image.link
-                        const wrapper = document.createElement("div")
-                        wrapper.classList.add("image-wrap")
-                        wrapper.appendChild(img)
-                        return wrapper
-                    });
-                    console.log(imgs)
-                    imgs.forEach(function (img) {
-                        main.appendChild(img)
-                    })
+                const images = JSON.parse(response).data;
+                const numberImagesToDisplay = randomFromLength(1, images.length)
 
+                const keys = []
+                for (let i = 0; i < numberImagesToDisplay; i++) {
+                    let random = randomFromLength(0, images.length)
+                    keys.push(images[random])
+                    images.splice(random, 1)
+                }
+                const imgs = keys.filter(image => image).map(image => {
+                    const img = document.createElement("img")
+                    img.src = image.link
+                    const wrapper = document.createElement("div")
+                    wrapper.classList.add("image-wrap")
+                    wrapper.appendChild(img)
+                    return wrapper
+                });
+
+                imgs.forEach(function (img) {
+                    main.appendChild(img)
                 })
-                .catch(err => console.log("Cool error: ", err))
-        };
+
+            });
+        }
 
         function randomFromLength(min, max) {
             min = Math.ceil(min);
